@@ -218,6 +218,19 @@
     </header>
 
     <main class="container">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Oyun ara...">
+            <button class="search-btn">Ara</button>
+        </div>
+
+        <div id="search-results">
+            <div class="search-info">
+                <span id="results-count">0 sonuç bulundu</span>
+                <button class="clear-search">Aramayı Temizle</button>
+            </div>
+            <ul class="game-list" id="results-list"></ul>
+        </div>
+
         <div class="info-banner">
             Güncel Oyunlar, Listede bulunmayan oyunların mesajlar kısmından bize sormanız yeterlidir. Aradığınız oyunu kolay bulmak için "CTRL + F" yapıp oyun ismini aratabilirsiniz.
         </div>
@@ -230,10 +243,10 @@
 
     <script>
         // JSON dosyasındaki oyunları yükle
-        fetch('games.json')
-            .then(response => response.json())
+        fetch('games.txt')
+            .then(response => response.text())
             .then(data => {
-                const gameList = data.games; // games array'ini al
+                const gameList = data.split('\n').map(game => game.trim()).filter(game => game !== ''); // games.txt içeriğini al
                 const gameContainer = document.getElementById('all-games');
 
                 // Oyunları listeye ekle
@@ -245,6 +258,48 @@
                 });
             })
             .catch(error => console.error('Oyunlar yüklenemedi:', error));
+
+        // Arama işlevselliği
+        const searchInput = document.querySelector('.search-input');
+        const searchBtn = document.querySelector('.search-btn');
+        const searchResults = document.getElementById('search-results');
+        const resultsCount = document.getElementById('results-count');
+        const resultsList = document.getElementById('results-list');
+        const clearSearchBtn = document.querySelector('.clear-search');
+
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            if (searchTerm === '') return;
+
+            const gameItems = document.querySelectorAll('.game-item');
+            const results = [];
+
+            gameItems.forEach(item => {
+                const title = item.querySelector('.game-title').textContent.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    results.push(item);
+                }
+            });
+
+            // Arama sonuçlarını göster
+            resultsCount.textContent = `"${searchTerm}" için ${results.length} sonuç bulundu`;
+            resultsList.innerHTML = '';
+            results.forEach(item => {
+                resultsList.appendChild(item.cloneNode(true));
+            });
+
+            searchResults.classList.add('active');
+        }
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') performSearch();
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchResults.classList.remove('active');
+        });
     </script>
 </body>
 </html>

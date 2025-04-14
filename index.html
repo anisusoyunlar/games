@@ -1,3 +1,8 @@
+<?php
+// games.txt dosyasını oku
+$games = file('games.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+?>
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -143,56 +148,6 @@
             color: var(--text-color);
         }
 
-        .search-container {
-            padding: 20px 0;
-            display: flex;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            background-color: var(--secondary-bg);
-            color: var(--text-color);
-            border-radius: 4px 0 0 4px;
-        }
-
-        .search-btn {
-            padding: 10px 15px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-        }
-
-        #search-results {
-            display: none;
-            margin-bottom: 30px;
-        }
-
-        #search-results.active {
-            display: block;
-        }
-
-        .search-info {
-            background-color: var(--secondary-bg);
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .clear-search {
-            color: var(--accent-color);
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -211,7 +166,7 @@
             <div class="header-content">
                 <a href="#" class="logo">
                     <span class="logo-icon">⚡</span>
-                    Anisus GAMES
+                    Oyun Mağazası
                 </a>
                 <nav class="nav-menu">
                     <a href="#" class="nav-link">Anasayfa</a>
@@ -228,75 +183,19 @@
     </header>
 
     <main class="container">
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="Oyun ara...">
-            <button class="search-btn">Ara</button>
-        </div>
-
-        <div id="search-results">
-            <div class="search-info">
-                <span id="results-count">0 sonuç bulundu</span>
-                <button class="clear-search">Aramayı Temizle</button>
-            </div>
-            <ul class="game-list" id="results-list"></ul>
-        </div>
-
         <div class="info-banner">
             Güncel Oyunlar, Listede bulunmayan oyunların mesajlar kısmından bize sormanız yeterlidir. Aradığınız oyunu kolay bulmak için "CTRL + F" yapıp oyun ismini aratabilirsiniz.
         </div>
 
         <h2 class="section-title">Tüm Oyunlar</h2>
-        <ul class="game-list" id="all-games"></ul>
-
-        <section class="game-adder" style="margin-top: 30px;">
-            <h2 class="section-title">Toplu Oyun Ekle</h2>
-            <textarea id="game-input" rows="10" placeholder="Her satıra bir oyun ismi yazın..." style="width: 100%; padding: 10px; background-color: #222; color: #eee; border: 1px solid #444; border-radius: 4px;"></textarea>
-            <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
-                <button id="add-games-btn" class="search-btn">Oyunları Ekle</button>
-            </div>
-        </section>
+        <ul class="game-list" id="all-games">
+            <?php
+            // Oyunları yazdır
+            foreach ($games as $game) {
+                echo "<li class='game-item'><span class='game-title'>$game</span></li>";
+            }
+            ?>
+        </ul>
     </main>
-
-    <script>
-        const allGames = JSON.parse(localStorage.getItem('all-games')) || [];
-
-        function renderGames(gameList, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            gameList.forEach(game => {
-                const li = document.createElement('li');
-                li.className = 'game-item';
-                const titleSpan = document.createElement('span');
-                titleSpan.className = 'game-title';
-                titleSpan.textContent = game.title;
-                li.appendChild(titleSpan);
-                container.appendChild(li);
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            renderGames(allGames, 'all-games');
-
-            const addBtn = document.getElementById('add-games-btn');
-            const gameInput = document.getElementById('game-input');
-
-            addBtn.addEventListener('click', () => {
-                const rawText = gameInput.value.trim();
-                if (!rawText) return alert("Oyun ismi girmediniz.");
-
-                const lines = rawText.split('\n').filter(line => line.trim() !== '');
-                const newEntries = lines.map(title => ({ title: title.trim() }));
-
-                allGames.push(...newEntries);
-                renderGames(allGames, 'all-games');
-
-                // Save to localStorage
-                localStorage.setItem('all-games', JSON.stringify(allGames));
-
-                gameInput.value = '';
-                alert(`${newEntries.length} oyun başarıyla eklendi.`);
-            });
-        });
-    </script>
 </body>
 </html>

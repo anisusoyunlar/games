@@ -1,8 +1,3 @@
-<?php
-// games.txt dosyasını oku
-$games = file('games.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-?>
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -148,6 +143,56 @@ $games = file('games.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             color: var(--text-color);
         }
 
+        .search-container {
+            padding: 20px 0;
+            display: flex;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .search-btn {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        #search-results {
+            display: none;
+            margin-bottom: 30px;
+        }
+
+        #search-results.active {
+            display: block;
+        }
+
+        .search-info {
+            background-color: var(--secondary-bg);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clear-search {
+            color: var(--accent-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -168,16 +213,6 @@ $games = file('games.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                     <span class="logo-icon">⚡</span>
                     Oyun Mağazası
                 </a>
-                <nav class="nav-menu">
-                    <a href="#" class="nav-link">Anasayfa</a>
-                    <a href="#" class="nav-link">Tüm Oyunlar</a>
-                    <a href="#" class="nav-link">Kategoriler</a>
-                    <a href="#" class="nav-link">İndirimdekiler</a>
-                </nav>
-                <div class="user-actions">
-                    <button class="icon-btn"><i>🔔</i></button>
-                    <button class="icon-btn btn-primary"><i>👤</i></button>
-                </div>
             </div>
         </div>
     </header>
@@ -189,13 +224,27 @@ $games = file('games.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
         <h2 class="section-title">Tüm Oyunlar</h2>
         <ul class="game-list" id="all-games">
-            <?php
-            // Oyunları yazdır
-            foreach ($games as $game) {
-                echo "<li class='game-item'><span class='game-title'>$game</span></li>";
-            }
-            ?>
+            <!-- Oyunlar burada yüklenecek -->
         </ul>
     </main>
+
+    <script>
+        // JSON dosyasındaki oyunları yükle
+        fetch('games.json')
+            .then(response => response.json())
+            .then(data => {
+                const gameList = data.games; // games array'ini al
+                const gameContainer = document.getElementById('all-games');
+
+                // Oyunları listeye ekle
+                gameList.forEach(game => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('game-item');
+                    listItem.innerHTML = `<span class="game-title">${game}</span>`;
+                    gameContainer.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Oyunlar yüklenemedi:', error));
+    </script>
 </body>
 </html>
